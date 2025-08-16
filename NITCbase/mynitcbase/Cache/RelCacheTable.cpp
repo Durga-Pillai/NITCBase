@@ -16,7 +16,7 @@ int RelCacheTable::getRelCatEntry(int relId, RelCatEntry* relCatBuf) {
   if (relCache[relId] == nullptr) {
     return E_RELNOTOPEN;
   }
-  printf("getRelcat\n");
+  //printf("getRelcat\n");
   // copy the value to the relCatBuf argument
   *relCatBuf = relCache[relId]->relCatEntry;
 
@@ -39,4 +39,47 @@ void RelCacheTable::recordToRelCatEntry(union Attribute record[RELCAT_NO_ATTRS],
       relCatEntry->lastBlk=(int)record[RELCAT_LAST_BLOCK_INDEX].nVal;
       relCatEntry->numSlotsPerBlk=(int)record[RELCAT_NO_SLOTS_PER_BLOCK_INDEX].nVal;
   
+}
+
+/* will return the searchIndex for the relation corresponding to `relId
+NOTE: this function expects the caller to allocate memory for `*searchIndex`
+*/
+int RelCacheTable::getSearchIndex(int relId, RecId* searchIndex) {
+  // check if 0 <= relId < MAX_OPEN and return E_OUTOFBOUND otherwise
+  if(relId <0 || relId >=MAX_OPEN) return E_OUTOFBOUND;
+
+  // check if relCache[relId] == nullptr and return E_RELNOTOPEN if true
+  if(relCache[relId] == nullptr) return E_RELNOTOPEN;
+
+  // copy the searchIndex field of the Relation Cache entry corresponding
+  //   to input relId to the searchIndex variable.
+  *searchIndex = relCache[relId]->searchIndex;
+  return SUCCESS;
+}
+
+// sets the searchIndex for the relation corresponding to relId
+int RelCacheTable::setSearchIndex(int relId, RecId* searchIndex) {
+
+  // check if 0 <= relId < MAX_OPEN and return E_OUTOFBOUND otherwise
+  if(relId <0 || relId >=MAX_OPEN) return E_OUTOFBOUND;
+
+  // check if relCache[relId] == nullptr and return E_RELNOTOPEN if true
+  if(relCache[relId] == nullptr) return E_RELNOTOPEN;
+
+  
+
+  // update the searchIndex value in the relCache for the relId to the searchIndex argument
+  relCache[relId]->searchIndex = *searchIndex;
+
+  return SUCCESS;
+}
+
+int RelCacheTable::resetSearchIndex(int relId) {
+  // use setSearchIndex to set the search index to {-1, -1}
+  if(relId <0 || relId >=MAX_OPEN) return E_OUTOFBOUND;
+  if(relCache[relId] == nullptr) return E_RELNOTOPEN;
+  //RelCacheTable::setSearchIndex(relId,relCache[relId]->searchIndex)
+  RelCacheTable::relCache[relId]->searchIndex = {-1,-1};
+  return SUCCESS;
+
 }

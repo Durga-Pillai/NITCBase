@@ -11,26 +11,25 @@ int main(int argc, char *argv[])
   /* Initialize the Run Copy of Disk */
   Disk disk_run;
   StaticBuffer buffer;
-  OpenRelTable cache;
+  OpenRelTable cache; 
 
-  for (int i = 0; i <= 2; i++)
-  {
-    RelCatEntry relCatBuffer;
-     RelCacheTable::getRelCatEntry(i,&relCatBuffer);
-        printf("Relation[%d]: %s\n",i, relCatBuffer.relName);
-    //printf("%d",relCatBuffer.numAttrs);
-     for(int j=0;j<relCatBuffer.numAttrs;j++) {
-     // printf("2nd loop");
-      AttrCatEntry attrCatBuffer[ATTRCAT_NO_ATTRS];
-       AttrCacheTable::getAttrCatEntry(i,j,attrCatBuffer);
-       const char* attrType = attrCatBuffer->attrType == NUMBER? "NUM" : "STR";
-       printf("  %s: %s\n", attrCatBuffer->attrName, attrType);
+  //STAGE 3 
+  // for (int i = 0; i <= 2; i++)
+  // {
+  //   RelCatEntry relCatBuffer;
+  //    RelCacheTable::getRelCatEntry(i,&relCatBuffer);
+  //       printf("Relation[%d]: %s\n",i, relCatBuffer.relName);
+  //   //printf("%d",relCatBuffer.numAttrs);
+  //    for(int j=0;j<relCatBuffer.numAttrs;j++) {
+  //    // printf("2nd loop");
+  //     AttrCatEntry attrCatBuffer[ATTRCAT_NO_ATTRS];
+  //      AttrCacheTable::getAttrCatEntry(i,j,attrCatBuffer);
+  //      const char* attrType = attrCatBuffer->attrType == NUMBER? "NUM" : "STR";
+  //      printf("  %s: %s\n", attrCatBuffer->attrName, attrType);
                                                    
-     }
-    }
-                                                
-
-      return 0;
-
-      // return FrontendInterface::handleFrontend(argc, argv);
-  }
+  //    }
+  //    }
+   
+  //STAGE 4
+  return FrontendInterface::handleFrontend(argc, argv);
+   }
