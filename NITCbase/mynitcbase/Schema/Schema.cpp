@@ -18,7 +18,7 @@ int Schema::openRel(char relName[ATTR_SIZE]) {
   }
   
   int Schema::closeRel(char relName[ATTR_SIZE]) {
-    if (strcpy(relName,RELCAT_RELNAME)==0 || strcpy(relName,ATTRCAT_RELNAME)==0)  {
+    if (strcmp(relName,RELCAT_RELNAME)==0 || strcmp(relName,ATTRCAT_RELNAME)==0)  {
       return E_NOTPERMITTED;
     }
   
