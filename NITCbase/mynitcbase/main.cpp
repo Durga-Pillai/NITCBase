@@ -10,8 +10,14 @@ int main(int argc, char *argv[])
 {
   /* Initialize the Run Copy of Disk */
   Disk disk_run;
+    printf("came main\n");
+
   StaticBuffer buffer;
-  OpenRelTable cache; 
+  printf("came main\n");
+  printf("About to construct OpenRelTable\n"); fflush(stdout);
+  OpenRelTable cache;
+  printf("Constructed OpenRelTable\n"); fflush(stdout);
+  
 
   //STAGE 3 
   // for (int i = 0; i <= 2; i++)
@@ -31,5 +37,6 @@ int main(int argc, char *argv[])
   //    }
    
   //STAGE 4
+  
   return FrontendInterface::handleFrontend(argc, argv);
    }

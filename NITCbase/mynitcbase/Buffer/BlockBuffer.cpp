@@ -65,9 +65,18 @@ BlockBuffer::BlockBuffer(int blockNum) {
 int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **buffPtr) {
   int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
   if(bufferNum == E_BLOCKNOTINBUFFER) {
-    bufferNum = StaticBuffer::getFreeBuffer(this->blockNum);
-  
-  if(bufferNum == E_OUTOFBOUND) {
+   for(int bufferind =0;bufferind<BUFFER_CAPACITY;bufferind++){
+    if(bufferind == bufferNum){
+      StaticBuffer::metainfo[bufferind].timeStamp = 0;
+    }
+    else {
+      StaticBuffer::metainfo[bufferind].timeStamp += 1;
+    }
+   }
+  }
+  else{
+      bufferNum = StaticBuffer::getFreeBuffer(this->blockNum);
+      if(bufferNum == E_OUTOFBOUND) {
     return E_OUTOFBOUND;
   }
   Disk::readBlock(StaticBuffer::blocks[bufferNum],this->blockNum);
@@ -95,7 +104,7 @@ int RecBuffer::setRecord(union Attribute *rec,int slotNum) {
   unsigned char *slotPointer = bufferPtr+(HEADER_SIZE+slotCount+(recordSize*slotNum));
 
   memcpy(slotPointer,rec,recordSize);
-  Disk::writeBlock(bufferPtr,this->blockNum);
+  StaticBuffer::setDirtyBit(this->blockNum);
   
 
   return SUCCESS;

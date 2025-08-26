@@ -1,4 +1,5 @@
 #include "StaticBuffer.h"
+#include<iostream>
 unsigned char StaticBuffer::blocks[BUFFER_CAPACITY][BLOCK_SIZE];
 struct BufferMetaInfo StaticBuffer::metainfo[BUFFER_CAPACITY];
 StaticBuffer::StaticBuffer() {
@@ -18,31 +19,59 @@ StaticBuffer::StaticBuffer() {
   not modifying the buffer. So, we will define an empty destructor for now. In
   subsequent stages, we will implement the write-back functionality here.
   */
-  StaticBuffer::~StaticBuffer() {}
+  StaticBuffer::~StaticBuffer() {
+    printf("Came buffer descructor\n");
+    for(int bufferind = 0;bufferind<BUFFER_CAPACITY;bufferind++){
+      if(metainfo[bufferind].free == false && metainfo[bufferind].dirty == true) {
+        Disk::writeBlock(StaticBuffer::blocks[bufferind],metainfo[bufferind].blockNum);
+      }
+    }
+  }
   
   int StaticBuffer::getFreeBuffer(int blockNum) {
-    if (blockNum < 0 || blockNum > DISK_BLOCKS) {
+    if (blockNum < 0 || blockNum >= DISK_BLOCKS) {
       return E_OUTOFBOUND;
     }
-    int allocatedBuffer;
-  
-    // iterate through all the blocks in the StaticBuffer
-    // find the first free block in the buffer (check metainfo)
-    // assign allocatedBuffer = index of the free block
+    printf("Came getfreebuffer");
+   int bufferNum = -1, bufferWithMaxTimeStamp = -1,maxTimeStamp=0;
+    // increase the timeStamp in metaInfo of all occupied buffers.
 
-    for(int i=0;i<BUFFER_CAPACITY;i++) {
-        if(metainfo[i].free) {
-            allocatedBuffer = i;
-            break;
-        } 
+    // let bufferNum be used to store the buffer number of the free/freed buffer.
+    for(int bufferind =0;bufferind< BUFFER_CAPACITY;bufferind++){
+      if(metainfo[bufferind].free == false){
+        metainfo[bufferind].timeStamp +=1;
+        if(maxTimeStamp<metainfo[bufferind].timeStamp) {
+          bufferWithMaxTimeStamp=bufferind;
+          maxTimeStamp=metainfo[bufferind].timeStamp;
+        }
+      }
+      if(metainfo[bufferind].free == true && bufferNum==-1){
+        bufferNum = bufferind;
+      }
+
     }
-  
-    metainfo[allocatedBuffer].free = false;
-    metainfo[allocatedBuffer].timeStamp=0;
-    metainfo[allocatedBuffer].dirty = false;
-    metainfo[allocatedBuffer].blockNum = blockNum;
-  
-    return allocatedBuffer;
+    if(bufferNum == -1) {
+      if(metainfo[bufferWithMaxTimeStamp].dirty == true){
+        Disk::writeBlock(StaticBuffer::blocks[bufferWithMaxTimeStamp],metainfo[bufferWithMaxTimeStamp].blockNum);
+      }
+      bufferNum = bufferWithMaxTimeStamp;
+    }
+    // iterate through metainfo and check if there is any buffer free
+
+    // if a free buffer is available, set bufferNum = index of that free buffer.
+
+    // if a free buffer is not available,
+    //     find the buffer with the largest timestamp
+    //     IF IT IS DIRTY, write back to the disk using Disk::writeBlock()
+    //     set bufferNum = index of this buffer
+
+    // update the metaInfo entry corresponding to bufferNum with
+    // free:false, dirty:false, blockNum:the input block number, timeStamp:0.
+    metainfo[bufferNum].free = false;
+    metainfo[bufferNum].dirty=false;
+    metainfo[bufferNum].blockNum=blockNum;
+    metainfo[bufferNum].timeStamp =0;
+    return bufferNum;
   }
   
   /* Get the buffer index where a particular block is stored
@@ -64,4 +93,26 @@ StaticBuffer::StaticBuffer() {
 
   // if block is not in the buffer
   return E_BLOCKNOTINBUFFER;
+}
+
+int StaticBuffer::setDirtyBit(int blockNum){
+  // find the buffer index corresponding to the block using getBufferNum().
+  int bufferNum = StaticBuffer::getBufferNum(blockNum);
+
+
+  // if block is not present in the buffer (bufferNum = E_BLOCKNOTINBUFFER)
+  //     return E_BLOCKNOTINBUFFER
+  if(bufferNum == E_BLOCKNOTINBUFFER) return E_BLOCKNOTINBUFFER;
+
+  if(bufferNum == E_OUTOFBOUND) return E_OUTOFBOUND;
+
+  // if blockNum is out of bound (bufferNum = E_OUTOFBOUND)
+  //     return E_OUTOFBOUND
+  metainfo[bufferNum].dirty = true;
+
+  // else
+  //     (the bufferNum is valid)
+  //     set the dirty bit of that buffer to true in metainfo
+
+   return SUCCESS;
 }
