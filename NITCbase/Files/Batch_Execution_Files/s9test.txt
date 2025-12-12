@@ -1,0 +1,10 @@
+echo
+select * from QuizMarks into Cgpat where cgpa>8;
+open table Cgpat
+select * from Cgpat into Quizt where quizMarks>85;
+open table Quizt
+select rollNo,name from Quizt into KeralaT where location = Kerala;
+select rollNo,name from Quizt into GujaratT where location = Gujarat;
+select rollNo,name from Quizt into Telangana where location = Telangana;
+echo Done
+  

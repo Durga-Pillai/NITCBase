@@ -10,13 +10,11 @@ int main(int argc, char *argv[])
 {
   /* Initialize the Run Copy of Disk */
   Disk disk_run;
-    printf("came main\n");
+    
 
   StaticBuffer buffer;
-  printf("came main\n");
-  printf("About to construct OpenRelTable\n"); fflush(stdout);
   OpenRelTable cache;
-  printf("Constructed OpenRelTable\n"); fflush(stdout);
+  
   
 
   //STAGE 3 
